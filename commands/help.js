@@ -1,8 +1,16 @@
+// Settings file එක load කරනවා
 const settings = require('../settings');
+
+// File system module එක import කරනවා (file read/write වගේ වැඩ වලට)
 const fs = require('fs');
+
+// File path handle කරන්න path module එක use කරනවා
 const path = require('path');
 
+// Help command main function එක
 async function helpCommand(sock, chatId, message) {
+
+    // Userට දෙන Help message එක (Original text එක කිසිම පාරක් edit කරලා නෑ)
     const helpMessage = `
 ╔═══════════════════╗
    *🤖 ${settings.botName || 'KnightBot-MD'}*  
@@ -228,11 +236,17 @@ async function helpCommand(sock, chatId, message) {
 Join our channel for updates:`;
 
     try {
+
+        // Bot image එක save වෙලා තියෙන path එක define කරනවා
         const imagePath = path.join(__dirname, '../assets/bot_image.jpg');
         
+        // Image file එක තියෙනවද check කරලා
         if (fs.existsSync(imagePath)) {
+
+            // Image එක buffer එකක් විදිහට read කරනවා
             const imageBuffer = fs.readFileSync(imagePath);
             
+            // Bot image + help menu එක WhatsAppට send කරනවා
             await sock.sendMessage(chatId, {
                 image: imageBuffer,
                 caption: helpMessage,
@@ -246,8 +260,13 @@ Join our channel for updates:`;
                     }
                 }
             },{ quoted: message });
+
         } else {
+
+            // Image එක නැත්නම් error print කරනවා
             console.error('Bot image not found at:', imagePath);
+
+            // Help text එක විතර WhatsAppට send කරනවා
             await sock.sendMessage(chatId, { 
                 text: helpMessage,
                 contextInfo: {
@@ -261,10 +280,16 @@ Join our channel for updates:`;
                 }
             });
         }
+
     } catch (error) {
+
+        // Error එකක් අන්තර්ගත වුනාම console එකට print කරනවා
         console.error('Error in help command:', error);
+
+        // Error එකක් ආවොත් text help message එක විතර send කරනවා
         await sock.sendMessage(chatId, { text: helpMessage });
     }
 }
 
+// Help command function එක export කරනවා
 module.exports = helpCommand;
